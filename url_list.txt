@@ -1,0 +1,5 @@
+https://raw.githubusercontent.com/MikeTyson93/Asterisk/master/asterisk_conf/manager.conf
+https://raw.githubusercontent.com/MikeTyson93/Asterisk/master/asterisk_conf/sip.conf
+https://raw.githubusercontent.com/MikeTyson93/Asterisk/master/asterisk_conf/extensions.conf
+https://raw.githubusercontent.com/MikeTyson93/Asterisk/master/asterisk_conf/extensions_additional.conf
+https://raw.githubusercontent.com/MikeTyson93/Asterisk/master/asterisk_conf/extensions_custom.conf
