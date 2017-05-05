@@ -92,6 +92,7 @@ def setStart(start):
     return callListIterationsDone
 
 def call(start):
+    firstcall = True
     totalCalls = 0
     maxCalls = 0
     numberCount = 0
@@ -113,7 +114,11 @@ def call(start):
         for call in Calls:
             if int(call[1]) > 0:
                 call[1] = call[1] - 1
-                callCommand = COMMAND + call[0] + EXTENSION
+                if firstcall:
+                    callCommand = COMMAND + call[0] + INITEXTENSION
+                    firstcall = False
+                else:
+                    callCommand = COMMAND + call[0] + EXTENSION
                 #start call
                 #subprocess.Popen(callCommand, shell=True)
                 print(callCommand)
