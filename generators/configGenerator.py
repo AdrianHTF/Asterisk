@@ -102,15 +102,16 @@ def createNumberConfig(file):
     for x in range(len(domains)):
         trunkNames.append('number' + str(counter))
         file.write('\n[number' + str(counter) + ']\n' +
-                   'type=peer\n' +
-                   'context = name-record\n' +
-                   'canreinvite = no\n' +
-                   'defaultuser = ' + str(users[counter]) + '\n' +
-                   'secret = ' + str(secrets[counter]) + '\n' +
-                   'fromdomain = ' + str(domains[counter]) + '\n' +
-                   'host = ' + str(domains[counter]) + '\n' +
-                   'hassip = yes \n' +
-                   'registersip = yes \n')
+                    'host=' + str(domains[counter]) + '\n' +
+                    'type=friend\n' +
+                    'fromdomain=' + str(domains[counter]) + '\n' +
+                    'disallow=all\n' +
+                    'allow=alaw&ulaw\n' +
+                    'dtmfmode=auto\n' +
+                    'secret=' + str(secrets[counter]) + '\n' +
+                    'defaultuser=' + str(users[counter]) + '\n' +
+                    'trunkname=' + str(users[counter]) + '\n' +
+                    'fromuser=' + str(users[counter]) + '\n')
         counter += 1
 
 
