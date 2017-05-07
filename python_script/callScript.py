@@ -1,25 +1,26 @@
 import sys
-import os
 import subprocess
 import time
 import getopt
+from random import shuffle
 
 CALLLIST = "callList"
 INITEXTENSION = ' extension 103@init-global-counter"'
 EXTENSION = ' extension 102@name-record"'
 COMMAND = '/usr/sbin/asterisk -rx "channel originate '
-#callduration should be slightly higher than the real duration
-CALLDURATION = 5
-CALLWINDOW = 60
+
 
 Calls = []
 def main():
+    # callduration should be slightly higher than the real duration
+    callDuration = 5
+    # time the calls should be distributed in
+    callWindow = 60
     replaceTarget = False
-    replaceStart = False
     target = ""
     start = 0
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:s:", ["target=", "start="])
+        opts, args = getopt.getopt(sys.argv[1:], "t:s:d:w:h", ["target=", "start=", "duration", "window", "help"])
     except getopt.GetoptError as err:
         print(err)
         sys.exit(2)
@@ -27,13 +28,21 @@ def main():
         if o in ("-t", "--target"):
             replaceTarget = True
             target = a
+            print("target: " + target)
         elif o in ("-s", "--start"):
-            replaceStart = True
             start = a
+        elif o in ("-d", "--duration"):
+            callDuration = int(a)
+        elif o in ("-w", "--window"):
+            callWindow = int(a)
+        elif o in ("-h", "--help"):
+            print("possible parameters are:\n" +
+                  "-t <target>: replaces all numbers which are called with this target\n" +
+                  "-s <start>: starts the script at the point where 'start' calls are already done\n" +
+                  "-d <duration>: specifies the duration of a call\n" +
+                  "-w <callwindow>: specifies the time in which the script executes the calls\n"
+                  )
 
-    print(str(replaceTarget))
-    print("target: " + target)
-    print(str(replaceStart))
     print("startAt: " + str(start))
 
     startTime = time.time()
@@ -41,7 +50,7 @@ def main():
         readCallListAndReplaceTarget(CALLLIST, target)
     else:
         readCallList(CALLLIST)
-    call(int(start))
+    call(int(start), callDuration, callWindow)
     totalTime = time.time() - startTime
     print("executing script took: " + str(totalTime) + "sec")
 
@@ -51,7 +60,6 @@ def readCallList(file):
             lines = line.rstrip('\n').split(',')
             call = [lines[0], int(lines[1])]
             Calls.append(call)
-        print(Calls)
     input.close()
 
 def readCallListAndReplaceTarget(file, target):
@@ -62,7 +70,6 @@ def readCallListAndReplaceTarget(file, target):
             newLine = items[0] + '/' + items[1] + '/' + target
             call = [newLine, int(lines[1])]
             Calls.append(call)
-        print(Calls)
     input.close()
 
 
@@ -88,10 +95,9 @@ def setStart(start):
                 call[1] -= 1
                 start -= 1
         callListIterationsDone += 1
-    print(Calls)
     return callListIterationsDone
 
-def call(start):
+def call(start, callduration, callwindow):
     firstcall = True
     totalCalls = 0
     maxCalls = 0
@@ -104,7 +110,7 @@ def call(start):
         totalCalls += call[1]
         numberCount += 1
 
-    waitTime = calculateWaitTime(CALLDURATION, CALLWINDOW, maxCalls, totalCalls)
+    waitTime = calculateWaitTime(callduration, callwindow, maxCalls, totalCalls)
     callListIterationsDone = setStart(int(start))
     maxCalls = maxCalls - callListIterationsDone
     print("waitTime: " + str(waitTime))
@@ -121,12 +127,12 @@ def call(start):
                     callCommand = COMMAND + call[0] + EXTENSION
                 #start call
                 #subprocess.Popen(callCommand, shell=True)
-                print(callCommand)
-                print(call[1], x)
+                print("executing command: " + callCommand)
                 callsDone += 1
-                print("calls done: " + str(callsDone))
+                print("calls initiated: " + str(callsDone) + "\n")
                 time.sleep(waitTime)
-        time.sleep(CALLDURATION)
+        shuffle(Calls)
+        time.sleep(callduration)
 
 
 if __name__ == '__main__':
