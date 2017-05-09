@@ -21,14 +21,13 @@ def readTrunk(file):
     with open(file, "r")as input:
         for line in input:
             lines = line.split(',')
-            print("lines: ", lines)
             domains.append(lines[0].rstrip('\n'))
             users.append(lines[1].rstrip('\n'))
             secrets.append(lines[2].rstrip('\n'))
     input.close()
-    print(str(domains))
-    print(str(users))
-    print(str(secrets))
+    #print(str(domains))
+    #print(str(users))
+    #print(str(secrets))
 
 
 def writeSipConf(fileName):
@@ -65,6 +64,7 @@ def createNumberConfig(file):
                     'secret=' + str(secrets[counter]) + '\n' +
                     'defaultuser=' + str(users[counter]) + '\n' +
                     'trunkname=' + str(users[counter]) + '\n' +
+                    'callerid=' + str(users[counter]) + '\n' +
                     'fromuser=' + str(users[counter]) + '\n')
         counter += 1
 
@@ -74,7 +74,6 @@ def readTargetFile(file):
     with open(file, "r")as input:
         for line in input:
             lines = line.split(',')
-            print("callLine: ", lines)
             targetList.append(lines)
     input.close()
     return targetList
@@ -100,9 +99,10 @@ def writeCallList(file, targetList):
             index = randint(0, numberCount - 1)
             distributeCalls(callCount, index, max)
             total -= 1
-        print(callCount)
         for x in range(numberCount):
-            output.write(protocol+'/'+trunkNames[x]+'/'+target+','+str(callCount[x])+'\n')
+            callLine = protocol+'/'+trunkNames[x]+'/'+target+','+str(callCount[x])+'\n'
+            print('wrote callLine: ' + callLine)
+            output.write(callLine)
     output.close()
 
 
@@ -116,12 +116,9 @@ def distributeCalls(callCount, index, max):
             index = 0
         distributeCalls(callCount, index, max)
 
-        # def moveToSharedFolder(filename):
-        # TODO add move to sharedFolder
-
 
 targetList = readTargetFile(TARGET)
 readTrunk(TRUNK)
 writeSipConf(SIP_CONF)
 writeCallList(CALL_LIST, targetList)
-print(trunkNames)
+print("created Trunks: " + str(trunkNames))
