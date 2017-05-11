@@ -1,0 +1,9 @@
+# this downloads the image sttrube/asterisk, creates a container and runs it with a guided 2-step installation
+
+sudo docker run -w /persistent \
+        -v /home/ainesc17/persistent:/persistent \
+        --name asterisk \
+        -p 5901 \
+        -dit sttrube/asterisk /bin/bash
+sudo docker start asterisk
+sudo docker exec -it asterisk /bin/bash
